@@ -5,1094 +5,755 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Drivers of India's Fiscal Deficit — Quantitative Analysis</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-  :root {
-    --navy:    #0a1628;
-    --deep:    #0d1f3c;
-    --accent:  #c8922a;
-    --gold:    #e8b84b;
-    --saffron: #f4a637;
-    --teal:    #2a9d8f;
-    --crimson: #e63946;
-    --slate:   #8fa3b1;
-    --light:   #e8edf2;
-    --white:   #ffffff;
-    --muted:   #b0bec5;
-    --card-bg: rgba(255,255,255,0.05);
-    --border:  rgba(200,146,42,0.3);
-  }
+:root {
+  --saffron:    #E8640A;
+  --saffron2:   #F97316;
+  --india-green:#138808;
+  --green2:     #16A34A;
+  --navy:       #0D1B2A;
+  --navy2:      #1E3A5F;
+  --gold:       #D97706;
+  --gold-lt:    #FCD34D;
+  --red:        #DC2626;
+  --purple:     #7C3AED;
+  --blue:       #2563EB;
+  --bg:         #F7F8FA;
+  --bg2:        #EEF2F7;
+  --white:      #FFFFFF;
+  --card:       #FFFFFF;
+  --border:     #E2E8F0;
+  --text:       #0D1B2A;
+  --text2:      #374151;
+  --muted:      #6B7280;
+  --muted2:     #9CA3AF;
+  --shadow:     0 4px 24px rgba(13,27,42,0.10);
+  --shadow-lg:  0 8px 48px rgba(13,27,42,0.15);
+}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+html, body { width:100%; height:100%; background:#DCE3EC; font-family:'Inter',sans-serif; overflow:hidden; }
 
-  html, body {
-    width: 100%; height: 100%;
-    background: var(--navy);
-    font-family: 'Inter', sans-serif;
-    overflow: hidden;
-  }
+#deck { width:1280px; height:720px; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(1); transform-origin:center center; }
+.slide { width:1280px; height:720px; position:absolute; top:0; left:0; display:none; overflow:hidden; background:var(--bg); }
+.slide.active { display:flex; }
 
-  /* ─── Slide Container ─────────────────────────────────── */
-  #deck {
-    width: 1280px; height: 720px;
-    position: fixed;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%) scale(1);
-    transform-origin: center center;
-  }
+/* Animations */
+@keyframes fadeUp   { from { opacity:0; transform:translateY(22px); } to { opacity:1; transform:translateY(0); } }
+@keyframes scaleIn  { from { opacity:0; transform:scale(0.88); }     to { opacity:1; transform:scale(1); } }
+@keyframes slideR   { from { opacity:0; transform:translateX(36px); }to { opacity:1; transform:translateX(0); } }
+@keyframes pulseRing{ 0%{transform:scale(1);opacity:.5;} 100%{transform:scale(1.7);opacity:0;} }
+@keyframes barGrow  { from { width:0 !important; } to {} }
 
-  .slide {
-    width: 1280px; height: 720px;
-    position: absolute;
-    top: 0; left: 0;
-    display: none;
-    overflow: hidden;
-  }
-  .slide.active { display: flex; }
+.slide.active .a1{animation:fadeUp .5s .05s both;} .slide.active .a2{animation:fadeUp .5s .15s both;}
+.slide.active .a3{animation:fadeUp .5s .25s both;} .slide.active .a4{animation:fadeUp .5s .35s both;}
+.slide.active .a5{animation:fadeUp .5s .45s both;} .slide.active .a6{animation:fadeUp .5s .55s both;}
+.slide.active .a7{animation:fadeUp .5s .65s both;} .slide.active .a8{animation:fadeUp .5s .75s both;}
+.slide.active .ar{animation:slideR .55s .15s both;}
 
-  /* ─── Navigation ─────────────────────────────────────── */
-  #nav {
-    position: fixed;
-    bottom: 24px; left: 50%;
-    transform: translateX(-50%);
-    display: flex; align-items: center; gap: 16px;
-    background: rgba(10,22,40,0.85);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--border);
-    border-radius: 50px;
-    padding: 10px 24px;
-    z-index: 1000;
-  }
-  #nav button {
-    background: none; border: none; cursor: pointer;
-    color: var(--gold); font-size: 18px;
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    transition: background 0.2s;
-    display: flex; align-items: center; justify-content: center;
-  }
-  #nav button:hover { background: rgba(200,146,42,0.2); }
-  #nav button:disabled { color: var(--slate); cursor: default; }
-  #nav button:disabled:hover { background: none; }
-  #slide-counter {
-    color: var(--muted);
-    font-size: 13px; font-weight: 500;
-    min-width: 60px; text-align: center;
-  }
-  .dot-row { display: flex; gap: 6px; }
-  .dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--slate); cursor: pointer;
-    transition: background 0.2s, transform 0.2s;
-  }
-  .dot.active { background: var(--gold); transform: scale(1.3); }
+/* Side accent (India tricolour) */
+.sa { position:absolute; top:0; left:0; width:6px; height:100%; background:linear-gradient(180deg,#FF9933 33.3%,#fff 33.3% 66.6%,#138808 66.6%); }
 
-  /* ─── Common Layout Elements ─────────────────────────── */
-  .bg-gradient {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--deep) 60%, #0f2a4a 100%);
-  }
-  .accent-line {
-    width: 60px; height: 4px;
-    background: linear-gradient(90deg, var(--accent), var(--gold));
-    border-radius: 2px; margin-bottom: 20px;
-  }
-  .slide-tag {
-    font-size: 11px; font-weight: 600; letter-spacing: 2px;
-    text-transform: uppercase; color: var(--gold);
-    background: rgba(200,146,42,0.12);
-    border: 1px solid rgba(200,146,42,0.3);
-    padding: 4px 12px; border-radius: 20px;
-    display: inline-block; margin-bottom: 14px;
-  }
-  .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 38px; font-weight: 700;
-    color: var(--white); line-height: 1.2;
-    margin-bottom: 8px;
-  }
-  .section-subtitle {
-    font-size: 15px; color: var(--muted); font-weight: 400;
-    line-height: 1.6; max-width: 580px;
-  }
-  .card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px 24px;
-    backdrop-filter: blur(4px);
-  }
-  .card-title {
-    font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
-    text-transform: uppercase; color: var(--gold);
-    margin-bottom: 10px;
-  }
+/* Header */
+.hdr { position:absolute; top:0; left:6px; right:0; height:54px; background:var(--white); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 34px; gap:12px; }
+.hdr-logo { width:30px; height:30px; background:linear-gradient(135deg,var(--saffron),var(--gold)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; color:#fff; }
+.hdr-title { font-size:12px; font-weight:600; color:var(--navy2); }
+.hdr-sep { flex:1; }
+.hdr-tag { font-size:10px; font-weight:700; letter-spacing:1.8px; text-transform:uppercase; color:var(--saffron); background:rgba(232,100,10,.09); border:1px solid rgba(232,100,10,.25); padding:3px 10px; border-radius:20px; }
+.hdr-num { font-size:10px; font-weight:600; color:var(--muted2); }
 
-  /* ─── SLIDE 1: Title ────────────────────────────────── */
-  #s1 {
-    background: linear-gradient(135deg, #050e1a 0%, #0a1628 40%, #0d2b4a 100%);
-    flex-direction: row;
-    align-items: stretch;
-  }
-  .s1-left {
-    width: 55%;
-    padding: 70px 60px;
-    display: flex; flex-direction: column;
-    justify-content: center;
-    position: relative;
-    border-right: 1px solid rgba(200,146,42,0.15);
-  }
-  .s1-right {
-    width: 45%;
-    display: flex; flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 60px 50px;
-    gap: 18px;
-  }
-  .main-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 42px; font-weight: 900;
-    color: var(--white); line-height: 1.18;
-    margin-bottom: 22px;
-  }
-  .main-title span { color: var(--gold); }
-  .subtitle-text {
-    font-size: 15px; color: var(--muted);
-    line-height: 1.7; max-width: 500px;
-    margin-bottom: 28px;
-  }
-  .authors-block {
-    border-top: 1px solid rgba(200,146,42,0.2);
-    padding-top: 20px;
-    font-size: 13px; color: var(--slate); line-height: 1.8;
-  }
-  .meta-card {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px 22px;
-    width: 100%;
-  }
-  .meta-card .label { font-size: 10px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
-  .meta-card .value { font-size: 15px; font-weight: 500; color: var(--light); }
-  .ornament {
-    position: absolute; top: 30px; right: -1px;
-    width: 4px; height: 120px;
-    background: linear-gradient(180deg, transparent, var(--gold), transparent);
-  }
+/* Content area */
+.ca { position:absolute; top:54px; left:6px; right:0; bottom:0; }
 
-  /* ─── SLIDE 2: Research Questions ────────────────────── */
-  #s2 {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--deep) 100%);
-    flex-direction: column;
-    padding: 55px 70px;
-  }
-  .rq-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 18px;
-    margin-top: 28px;
-    flex: 1;
-  }
-  .rq-card {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(200,146,42,0.25);
-    border-radius: 14px;
-    padding: 22px 22px;
-    display: flex; flex-direction: column;
-    position: relative;
-    overflow: hidden;
-  }
-  .rq-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    background: linear-gradient(90deg, var(--accent), var(--gold));
-    border-radius: 14px 14px 0 0;
-  }
-  .rq-num {
-    font-family: 'Playfair Display', serif;
-    font-size: 36px; font-weight: 900;
-    color: rgba(200,146,42,0.15);
-    position: absolute; top: 12px; right: 18px;
-    line-height: 1;
-  }
-  .rq-icon { font-size: 28px; margin-bottom: 12px; }
-  .rq-heading { font-size: 13px; font-weight: 600; color: var(--gold); margin-bottom: 8px; letter-spacing: 0.5px; }
-  .rq-body { font-size: 13px; color: var(--muted); line-height: 1.6; }
+/* Typography */
+.chip { display:inline-flex; align-items:center; gap:6px; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--saffron); background:rgba(232,100,10,.08); border:1px solid rgba(232,100,10,.2); padding:4px 12px; border-radius:20px; margin-bottom:12px; }
+.chip.g { color:var(--india-green); background:rgba(19,136,8,.08); border-color:rgba(19,136,8,.2); }
+.chip.b { color:var(--blue); background:rgba(37,99,235,.08); border-color:rgba(37,99,235,.2); }
+.h2 { font-family:'Playfair Display',serif; font-size:34px; font-weight:900; color:var(--navy); line-height:1.2; }
+.h3 { font-family:'Playfair Display',serif; font-size:24px; font-weight:800; color:var(--navy); line-height:1.25; }
+.bmd { font-size:13.5px; color:var(--muted); line-height:1.65; }
+.mono { font-family:'JetBrains Mono',monospace; }
+.grad { background:linear-gradient(135deg,var(--saffron),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.gradg{ background:linear-gradient(135deg,var(--india-green),var(--green2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
 
-  /* ─── SLIDE 3: Data & Variables ──────────────────────── */
-  #s3 {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--deep) 100%);
-    flex-direction: row;
-    align-items: stretch;
-  }
-  .s3-left {
-    width: 40%; padding: 60px 50px;
-    display: flex; flex-direction: column; justify-content: center;
-    border-right: 1px solid rgba(200,146,42,0.12);
-  }
-  .s3-right {
-    width: 60%; padding: 50px 50px;
-    display: flex; flex-direction: column; justify-content: center;
-  }
-  .var-table { width: 100%; border-collapse: separate; border-spacing: 0; }
-  .var-table th {
-    font-size: 10px; letter-spacing: 1.8px; text-transform: uppercase;
-    color: var(--gold); text-align: left; padding: 8px 14px;
-    border-bottom: 1px solid rgba(200,146,42,0.3);
-  }
-  .var-table td {
-    padding: 11px 14px; font-size: 13px; color: var(--light);
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    vertical-align: top;
-  }
-  .var-table tr:hover td { background: rgba(200,146,42,0.06); }
-  .badge {
-    display: inline-block;
-    font-size: 10px; font-weight: 600; letter-spacing: 0.8px;
-    padding: 2px 8px; border-radius: 10px;
-  }
-  .badge-dep { background: rgba(230,57,70,0.2); color: #e63946; border: 1px solid rgba(230,57,70,0.4); }
-  .badge-ind { background: rgba(42,157,143,0.2); color: var(--teal); border: 1px solid rgba(42,157,143,0.4); }
+/* Cards */
+.card { background:var(--card); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); }
+.badge { font-size:10px; font-weight:700; padding:3px 8px; border-radius:12px; display:inline-block; }
+.bdep { background:#FEF3C7; color:#92400E; border:1px solid #FDE68A; }
+.bind { background:#DBEAFE; color:#1E40AF; border:1px solid #BFDBFE; }
+.bsig { background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7; }
+.bns  { background:#F3F4F6; color:#6B7280; border:1px solid #D1D5DB; }
 
-  /* ─── SLIDE 4: Methodology ───────────────────────────── */
-  #s4 {
-    background: linear-gradient(135deg, var(--navy) 0%, #0d2a42 100%);
-    flex-direction: column;
-    padding: 50px 70px;
-  }
-  .method-row {
-    display: grid;
-    grid-template-columns: 1fr 1.6fr;
-    gap: 28px;
-    margin-top: 24px;
-    flex: 1;
-  }
-  .method-steps { display: flex; flex-direction: column; gap: 14px; }
-  .step-item {
-    display: flex; align-items: flex-start; gap: 14px;
-  }
-  .step-num {
-    min-width: 32px; height: 32px;
-    background: linear-gradient(135deg, var(--accent), var(--gold));
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 700; color: var(--navy);
-  }
-  .step-text { font-size: 13.5px; color: var(--muted); line-height: 1.55; padding-top: 6px; }
-  .step-text strong { color: var(--light); }
-  .equation-box {
-    background: rgba(0,0,0,0.35);
-    border: 1px solid rgba(200,146,42,0.35);
-    border-radius: 14px;
-    padding: 26px 28px;
-    height: 100%;
-    display: flex; flex-direction: column; justify-content: center;
-  }
-  .eq-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
-  .eq-main {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 14.5px; color: var(--light);
-    line-height: 1.8;
-    word-break: break-word;
-  }
-  .eq-main .coef-pos { color: #e8b84b; }
-  .eq-main .coef-neg { color: var(--teal); }
-  .eq-main .var-name { color: #a8d8ea; }
-  .eq-divider { border: none; border-top: 1px solid rgba(200,146,42,0.2); margin: 14px 0; }
-  .eq-note { font-size: 12px; color: var(--slate); font-style: italic; }
+/* Coefficient bars */
+.cr { display:flex; align-items:center; gap:10px; margin-bottom:9px; }
+.clbl { font-size:12px; font-weight:600; color:var(--text2); min-width:126px; }
+.ctrk { flex:1; height:8px; background:#E5E7EB; border-radius:4px; overflow:hidden; }
+.cbar { height:100%; border-radius:4px; }
+.cpos { background:linear-gradient(90deg,var(--saffron),var(--gold-lt)); }
+.cneg { background:linear-gradient(90deg,var(--india-green),#4ADE80); }
+.cval { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; min-width:52px; text-align:right; }
+.vp { color:var(--saffron); } .vn { color:var(--india-green); } .vns { color:var(--muted2); }
 
-  /* ─── SLIDE 5: Model 1 Results ───────────────────────── */
-  #s5 {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--deep) 100%);
-    flex-direction: row;
-    align-items: stretch;
-  }
-  .s5-left {
-    width: 42%; padding: 55px 45px;
-    display: flex; flex-direction: column; justify-content: center;
-    border-right: 1px solid rgba(200,146,42,0.12);
-  }
-  .s5-right {
-    width: 58%; padding: 40px 40px;
-    display: flex; flex-direction: column; justify-content: center;
-  }
-  .stat-grid {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 14px; margin-bottom: 20px;
-  }
-  .stat-box {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px 18px;
-    text-align: center;
-  }
-  .stat-val {
-    font-family: 'Playfair Display', serif;
-    font-size: 28px; font-weight: 700;
-    color: var(--gold);
-  }
-  .stat-lbl { font-size: 11px; color: var(--muted); margin-top: 4px; letter-spacing: 0.5px; }
-  .coef-table { width: 100%; border-collapse: separate; border-spacing: 0; }
-  .coef-table th {
-    font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--gold); text-align: left; padding: 7px 12px;
-    border-bottom: 1px solid rgba(200,146,42,0.3);
-  }
-  .coef-table td {
-    padding: 9px 12px; font-size: 13px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-  }
-  .coef-table td:first-child { color: var(--light); font-weight: 500; }
-  .coef-table td:not(:first-child) { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
-  .sig-star { color: var(--gold); }
-  .pos { color: #e8b84b; }
-  .neg { color: var(--teal); }
-  .ns { color: var(--slate); }
-  .bar-track {
-    height: 6px; background: rgba(255,255,255,0.08);
-    border-radius: 3px; margin-top: 6px;
-    overflow: hidden;
-  }
-  .bar-fill-pos {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent), var(--gold));
-    border-radius: 3px;
-  }
-  .bar-fill-neg {
-    height: 100%;
-    background: linear-gradient(90deg, #2a9d8f, #52b69a);
-    border-radius: 3px;
-  }
-  .sig-badge {
-    font-size: 10px; font-weight: 600;
-    padding: 2px 8px; border-radius: 8px;
-    display: inline-block;
-  }
-  .sig-yes { background: rgba(42,157,143,0.2); color: var(--teal); }
-  .sig-no  { background: rgba(144,164,174,0.15); color: var(--muted); }
+/* Data table */
+.dt { width:100%; border-collapse:separate; border-spacing:0; }
+.dt thead th { font-size:9.5px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); padding:9px 13px; border-bottom:2px solid var(--border); background:var(--bg2); text-align:left; }
+.dt thead th:first-child{border-radius:10px 0 0 0;} .dt thead th:last-child{border-radius:0 10px 0 0;}
+.dt tbody td { padding:9px 13px; font-size:12.5px; color:var(--text2); border-bottom:1px solid var(--border); }
+.dt tbody tr:hover td { background:#F9FAFB; }
+.dt tbody tr:last-child td { border-bottom:none; }
 
-  /* ─── SLIDE 6: Model 2 ───────────────────────────────── */
-  #s6 {
-    background: linear-gradient(135deg, var(--navy) 0%, #0d2a42 100%);
-    flex-direction: column;
-    padding: 50px 70px;
-  }
-  .spiral-grid {
-    display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 28px;
-    margin-top: 24px;
-    flex: 1;
-  }
-  .spiral-left { display: flex; flex-direction: column; gap: 16px; }
-  .spiral-right { display: flex; flex-direction: column; gap: 16px; }
-  .finding-card {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(200,146,42,0.25);
-    border-radius: 12px;
-    padding: 18px 20px;
-  }
-  .finding-card.highlight {
-    border-color: rgba(200,146,42,0.6);
-    background: rgba(200,146,42,0.06);
-  }
-  .fc-title { font-size: 11px; font-weight: 600; letter-spacing: 1.3px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
-  .fc-body { font-size: 13px; color: var(--muted); line-height: 1.6; }
-  .fc-body strong { color: var(--light); }
-  .cycle-box {
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(200,146,42,0.3);
-    border-radius: 14px;
-    padding: 24px;
-    display: flex; flex-direction: column;
-    align-items: center; gap: 10px;
-    flex: 1;
-  }
-  .cycle-step {
-    background: rgba(200,146,42,0.1);
-    border: 1px solid rgba(200,146,42,0.4);
-    border-radius: 8px;
-    padding: 10px 20px;
-    text-align: center;
-    font-size: 12.5px; color: var(--light);
-    width: 100%;
-  }
-  .cycle-arrow { color: var(--gold); font-size: 18px; }
+/* Callout */
+.callout { background:linear-gradient(135deg,rgba(232,100,10,.05),rgba(217,119,6,.05)); border-left:4px solid var(--saffron); border-radius:0 12px 12px 0; padding:14px 18px; }
 
-  /* ─── SLIDE 7: Findings Summary ──────────────────────── */
-  #s7 {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--deep) 100%);
-    flex-direction: column;
-    padding: 50px 70px;
-  }
-  .findings-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
-    margin-top: 22px;
-    flex: 1;
-  }
-  .finding-big {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(200,146,42,0.25);
-    border-radius: 14px;
-    padding: 22px 24px;
-    display: flex; flex-direction: column;
-    position: relative; overflow: hidden;
-  }
-  .finding-big::after {
-    content: '';
-    position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
-    border-radius: 0 0 14px 14px;
-  }
-  .finding-big.f1::after { background: linear-gradient(90deg, var(--saffron), var(--gold)); }
-  .finding-big.f2::after { background: linear-gradient(90deg, var(--teal), #52b69a); }
-  .finding-big.f3::after { background: linear-gradient(90deg, #a78bfa, #818cf8); }
-  .finding-big.f4::after { background: linear-gradient(90deg, var(--crimson), #f4a261); }
-  .fb-icon { font-size: 26px; margin-bottom: 10px; }
-  .fb-title { font-size: 13px; font-weight: 600; color: var(--light); margin-bottom: 8px; }
-  .fb-body { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
-  .fb-stat { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--gold); margin-top: 8px; }
+/* Nav */
+#nav { position:fixed; bottom:16px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:14px; background:rgba(255,255,255,.92); backdrop-filter:blur(12px); border:1px solid rgba(13,27,42,.12); border-radius:50px; padding:8px 20px; box-shadow:0 4px 24px rgba(13,27,42,.12); z-index:1000; }
+#nav button { background:none; border:none; cursor:pointer; color:var(--navy2); font-size:16px; width:32px; height:32px; border-radius:50%; transition:background .2s,color .2s; display:flex; align-items:center; justify-content:center; }
+#nav button:hover { background:rgba(232,100,10,.1); color:var(--saffron); }
+#nav button:disabled { color:var(--muted2); cursor:default; }
+#nav button:disabled:hover { background:none; color:var(--muted2); }
+#slide-counter { font-size:12px; font-weight:600; color:var(--muted); min-width:48px; text-align:center; }
+.dr { display:flex; gap:6px; }
+.dot { width:7px; height:7px; border-radius:50%; background:var(--muted2); cursor:pointer; transition:background .2s,transform .2s; }
+.dot.active { background:var(--saffron); transform:scale(1.35); }
 
-  /* ─── SLIDE 8: Conclusion ────────────────────────────── */
-  #s8 {
-    background: linear-gradient(135deg, #050e1a 0%, #0a1628 50%, #0d2b4a 100%);
-    flex-direction: row;
-    align-items: stretch;
-  }
-  .s8-left {
-    width: 52%; padding: 60px 55px;
-    display: flex; flex-direction: column; justify-content: center;
-    border-right: 1px solid rgba(200,146,42,0.15);
-  }
-  .s8-right {
-    width: 48%; padding: 50px 45px;
-    display: flex; flex-direction: column; justify-content: center;
-    gap: 16px;
-  }
-  .policy-card {
-    background: rgba(255,255,255,0.04);
-    border-left: 3px solid var(--accent);
-    border-radius: 0 10px 10px 0;
-    padding: 14px 18px;
-  }
-  .policy-card:nth-child(2) { border-left-color: var(--teal); }
-  .policy-card:nth-child(3) { border-left-color: #a78bfa; }
-  .pc-title { font-size: 11px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
-  .pc-body { font-size: 13px; color: var(--muted); line-height: 1.55; }
-  .conclusion-quote {
-    font-family: 'Playfair Display', serif;
-    font-size: 20px; font-style: italic;
-    color: var(--light); line-height: 1.5;
-    margin-bottom: 20px;
-    padding-left: 20px;
-    border-left: 3px solid var(--gold);
-  }
-  .takeaway-row { display: flex; gap: 14px; margin-bottom: 14px; }
-  .takeaway-item {
-    flex: 1;
-    background: rgba(200,146,42,0.08);
-    border: 1px solid rgba(200,146,42,0.25);
-    border-radius: 10px;
-    padding: 14px 14px;
-    text-align: center;
-  }
-  .ti-val {
-    font-family: 'Playfair Display', serif;
-    font-size: 24px; font-weight: 700;
-    color: var(--gold);
-  }
-  .ti-lbl { font-size: 11px; color: var(--muted); margin-top: 4px; }
-
-  /* ─── decorative elements ────────────────────────────── */
-  .corner-deco {
-    position: absolute;
-    width: 180px; height: 180px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(200,146,42,0.06) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .slide-number-tag {
-    position: absolute; top: 22px; right: 28px;
-    font-size: 11px; letter-spacing: 2px; color: var(--slate);
-  }
-  .india-stripe {
-    position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    background: linear-gradient(90deg, #ff9933 33.3%, #ffffff 33.3% 66.6%, #138808 66.6%);
-  }
+.wm { position:absolute; bottom:14px; right:22px; font-size:10px; font-weight:600; letter-spacing:1px; color:var(--muted2); text-transform:uppercase; }
+.dg { position:absolute; pointer-events:none; opacity:.04; background-image:repeating-linear-gradient(0deg,var(--navy) 0,var(--navy) 1px,transparent 1px,transparent 48px),repeating-linear-gradient(90deg,var(--navy) 0,var(--navy) 1px,transparent 1px,transparent 48px); }
 </style>
 </head>
 <body>
-
 <div id="deck">
 
-<!-- ══════════════════════════════════════════════════════
-     SLIDE 1 — TITLE
-══════════════════════════════════════════════════════ -->
-<div class="slide active bg-gradient" id="s1">
-  <div class="india-stripe"></div>
-  <div class="corner-deco" style="bottom:-60px;left:-60px;"></div>
-  <div class="corner-deco" style="top:-80px;right:100px; background: radial-gradient(circle, rgba(42,157,143,0.05) 0%, transparent 70%);"></div>
+<!-- ======================== SLIDE 1 — TITLE ======================== -->
+<div class="slide active" id="s1">
+<div class="sa"></div>
+<div class="dg" style="inset:0;width:100%;height:100%;"></div>
+<div style="position:absolute;inset:0;background:radial-gradient(ellipse 800px 600px at 110% 50%,rgba(232,100,10,.07) 0%,transparent 70%),radial-gradient(ellipse 500px 500px at -10% 80%,rgba(19,136,8,.05) 0%,transparent 60%),var(--bg);"></div>
 
-  <div class="s1-left">
-    <div class="ornament"></div>
-    <div class="slide-tag">Quantitative Research · 2026</div>
-    <h1 class="main-title">
-      Drivers of<br><span>India's Fiscal</span><br>Deficit
-    </h1>
-    <p class="subtitle-text">
-      Expenditure growth vs. revenue shortfall — and does interest on past borrowing create a <em>self-reinforcing cycle of debt</em>? An empirical investigation using two decades of Central Government data.
-    </p>
-    <div class="authors-block">
-      <strong style="color:var(--light);">Salini Gang</strong><br>
-      Quantitative Analysis Research Report<br>
-      Data: 2005–06 to 2024–25 &nbsp;·&nbsp; N = 20 observations<br>
-      Source: RBI Handbook &amp; Ministry of Finance
-    </div>
-  </div>
-
-  <div class="s1-right">
-    <div class="meta-card">
-      <div class="label">Primary Research Question</div>
-      <div class="value">What are the key drivers of India's fiscal deficit — expenditure growth or revenue shortfall?</div>
-    </div>
-    <div class="meta-card">
-      <div class="label">Secondary Question</div>
-      <div class="value">Does interest on past borrowing create a self-reinforcing cycle of debt?</div>
-    </div>
-    <div class="meta-card">
-      <div class="label">Methodology</div>
-      <div class="value">OLS Regression · Log-Ratio Transformation · 5-Variable Multiple Regression</div>
-    </div>
-    <div class="meta-card">
-      <div class="label">Model Performance</div>
-      <div class="value" style="font-size:20px; font-weight:700; color:var(--gold);">Adj. R² = 0.855 &nbsp;·&nbsp; p &lt; 0.001</div>
-    </div>
-  </div>
-  <div class="slide-number-tag">01 / 08</div>
+<div class="hdr">
+  <div class="hdr-logo">SG</div>
+  <span class="hdr-title">Salini Gang &middot; Quantitative Research</span>
+  <div class="hdr-sep"></div>
+  <span class="hdr-tag">FY 2005&ndash;06 to 2024&ndash;25</span>
+  <span class="hdr-num">01 / 08</span>
 </div>
 
+<div class="ca" style="display:flex;flex-direction:row;">
+  <!-- Left -->
+  <div style="width:55%;padding:0 50px;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1;">
+    <div class="a1" style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+      <div style="display:flex;width:28px;height:18px;border-radius:3px;overflow:hidden;">
+        <div style="flex:1;background:#FF9933;"></div>
+        <div style="flex:1;background:#fff;position:relative;"><div style="position:absolute;top:50%;left:50%;width:8px;height:8px;border-radius:50%;border:1.5px solid #000080;transform:translate(-50%,-50%);"></div></div>
+        <div style="flex:1;background:#138808;"></div>
+      </div>
+      <span style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);">India &middot; Central Government &middot; 2026</span>
+    </div>
 
-<!-- ══════════════════════════════════════════════════════
-     SLIDE 2 — RESEARCH QUESTIONS
-══════════════════════════════════════════════════════ -->
+    <div class="a2" style="font-family:'Playfair Display',serif;font-size:46px;font-weight:900;color:var(--navy);line-height:1.12;margin-bottom:18px;">
+      Drivers of India's<br><span style="color:var(--saffron);">Fiscal Deficit</span>
+    </div>
+
+    <p class="bmd a3" style="max-width:440px;margin-bottom:26px;">
+      What are the key drivers &mdash; expenditure growth or revenue shortfall &mdash; and does interest on past borrowing create a <strong>self-reinforcing cycle of debt</strong>? An empirical investigation using two decades of Central Government data.
+    </p>
+
+    <div class="a4" style="display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--muted);">
+      <span style="display:flex;align-items:center;gap:6px;"><span style="width:20px;height:20px;border-radius:6px;background:rgba(232,100,10,.1);display:flex;align-items:center;justify-content:center;font-size:11px;">&#128197;</span> FY 2005&ndash;06 to 2024&ndash;25</span>
+      <span style="display:flex;align-items:center;gap:6px;"><span style="width:20px;height:20px;border-radius:6px;background:rgba(232,100,10,.1);display:flex;align-items:center;justify-content:center;font-size:11px;">&#128300;</span> OLS Log-Ratio Regression</span>
+      <span style="display:flex;align-items:center;gap:6px;"><span style="width:20px;height:20px;border-radius:6px;background:rgba(232,100,10,.1);display:flex;align-items:center;justify-content:center;font-size:11px;">&#128200;</span> N = 20 Annual Observations</span>
+      <span style="display:flex;align-items:center;gap:6px;"><span style="width:20px;height:20px;border-radius:6px;background:rgba(232,100,10,.1);display:flex;align-items:center;justify-content:center;font-size:11px;">&#128193;</span> RBI Handbook &middot; MoF Budget</span>
+    </div>
+  </div>
+
+  <div style="width:1px;background:var(--border);margin:30px 0;align-self:stretch;"></div>
+
+  <!-- Right -->
+  <div style="width:45%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:14px;padding:36px 42px;position:relative;z-index:1;">
+    <div class="a5" style="display:flex;gap:12px;width:100%;">
+      <div style="flex:1;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;border-radius:12px;padding:14px 12px;text-align:center;box-shadow:0 4px 16px rgba(13,27,42,.22);">
+        <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:900;line-height:1;">0.855</div>
+        <div style="font-size:9px;opacity:.75;margin-top:4px;">Adjusted R&sup2;</div>
+      </div>
+      <div style="flex:1;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;border-radius:12px;padding:14px 12px;text-align:center;box-shadow:0 4px 16px rgba(13,27,42,.22);">
+        <div style="font-family:'Playfair Display',serif;font-size:26px;font-weight:900;line-height:1;">20.06</div>
+        <div style="font-size:9px;opacity:.75;margin-top:4px;">F-Statistic</div>
+      </div>
+      <div style="flex:1;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;border-radius:12px;padding:14px 12px;text-align:center;box-shadow:0 4px 16px rgba(13,27,42,.22);">
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:900;line-height:1;">&lt;0.001</div>
+        <div style="font-size:9px;opacity:.75;margin-top:4px;">p-value</div>
+      </div>
+    </div>
+    <div class="card a6" style="padding:16px 20px;width:100%;">
+      <div style="font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Primary Research Question</div>
+      <div style="font-size:14px;font-weight:600;color:var(--navy2);">What are the key drivers of India's fiscal deficit &mdash; expenditure growth or revenue shortfall?</div>
+    </div>
+    <div class="card a7" style="padding:16px 20px;width:100%;">
+      <div style="font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Debt Spiral Question</div>
+      <div style="font-size:14px;font-weight:600;color:var(--navy2);">Does interest on past borrowing create a self-reinforcing cycle of debt?</div>
+    </div>
+    <div class="card a8" style="padding:16px 20px;width:100%;background:linear-gradient(135deg,rgba(232,100,10,.06),rgba(217,119,6,.04));border-color:rgba(232,100,10,.2);">
+      <div style="font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Central Finding</div>
+      <div style="font-size:15px;font-weight:800;color:var(--saffron);">Subsidies + Defence &rarr; Fiscal Deterioration</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px;">Capital Expenditure &rarr; Fiscal Improvement (Self-financing)</div>
+    </div>
+  </div>
+</div>
+<div class="wm">Quantitative Analysis &middot; Salini Gang</div>
+</div><!-- /s1 -->
+
+
+<!-- ======================== SLIDE 2 — RESEARCH QUESTIONS ======================== -->
 <div class="slide" id="s2">
-  <div class="india-stripe"></div>
-  <div class="slide-tag">Research Framework</div>
-  <h2 class="section-title">Research Questions &amp; Motivation</h2>
-  <p class="section-subtitle">Three sub-questions decompose the primary inquiry; a secondary question on interest-rate transmission was ultimately found statistically insignificant.</p>
+<div class="sa"></div>
+<div class="hdr"><div class="hdr-logo">SG</div><span class="hdr-title">Research Framework</span><div class="hdr-sep"></div><span class="hdr-tag">Research Questions</span><span class="hdr-num">02 / 08</span></div>
+<div class="ca" style="display:flex;flex-direction:column;padding:24px 46px;gap:16px;">
+  <div class="a1">
+    <div class="chip">&#128203; Research Framework</div>
+    <div class="h2" style="margin-bottom:4px;">Research Questions &amp; Motivation</div>
+    <p class="bmd" style="max-width:680px;">Three sub-questions decompose the primary inquiry into testable empirical hypotheses, each with a specific quantitative prediction.</p>
+  </div>
 
-  <div class="rq-grid">
-    <div class="rq-card">
-      <span class="rq-num">01</span>
-      <div class="rq-icon">📊</div>
-      <div class="rq-heading">Sub-Question 1 — Subsidies</div>
-      <p class="rq-body">Does <strong style="color:var(--light)">subsidy growth</strong> significantly accelerate India's fiscal deficit growth rate? Food, fuel, and fertiliser subsidies represent the largest discretionary spending category.</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;flex:1;" >
+    <!-- RQ1 -->
+    <div class="a2" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:var(--shadow);display:flex;flex-direction:column;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--saffron),var(--gold-lt));border-radius:16px 16px 0 0;"></div>
+      <div style="font-family:'Playfair Display',serif;font-size:52px;font-weight:900;color:rgba(232,100,10,.07);position:absolute;top:6px;right:12px;line-height:1;">01</div>
+      <div style="width:38px;height:38px;border-radius:11px;background:rgba(232,100,10,.1);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px;">&#128200;</div>
+      <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:7px;">Sub-Q 1 &mdash; Subsidies</div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.6;flex:1;">Does <strong>subsidy growth</strong> significantly accelerate India's fiscal deficit growth rate? Food, fuel, and fertiliser subsidies represent the largest discretionary expenditure category.</p>
+      <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--saffron);">&beta; = +0.550 &middot; p = 0.0002 ***</div>
     </div>
-    <div class="rq-card">
-      <span class="rq-num">02</span>
-      <div class="rq-icon">🏗️</div>
-      <div class="rq-heading">Sub-Question 2 — Capital Expenditure</div>
-      <p class="rq-body">Is <strong style="color:var(--light)">capital expenditure growth</strong> fiscally self-financing through GDP multiplier effects? Does productive investment generate sufficient tax revenue to offset its direct cost?</p>
+    <!-- RQ2 -->
+    <div class="a3" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:var(--shadow);display:flex;flex-direction:column;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--india-green),#4ADE80);border-radius:16px 16px 0 0;"></div>
+      <div style="font-family:'Playfair Display',serif;font-size:52px;font-weight:900;color:rgba(19,136,8,.07);position:absolute;top:6px;right:12px;line-height:1;">02</div>
+      <div style="width:38px;height:38px;border-radius:11px;background:rgba(19,136,8,.1);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px;">&#127959;</div>
+      <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:7px;">Sub-Q 2 &mdash; Capital Expenditure</div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.6;flex:1;">Is <strong>capital expenditure growth</strong> fiscally self-financing via GDP multiplier effects? Does productive investment generate sufficient tax revenue to offset its direct fiscal cost?</p>
+      <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--india-green);">&beta; = &minus;0.436 &middot; p = 0.050 *</div>
     </div>
-    <div class="rq-card">
-      <span class="rq-num">03</span>
-      <div class="rq-icon">🔄</div>
-      <div class="rq-heading">Sub-Question 3 — Debt Cycle</div>
-      <p class="rq-body">Are <strong style="color:var(--light)">interest payments</strong> an independent cause or a lagged consequence of India's fiscal deficit? Do they perpetuate a self-reinforcing debt spiral?</p>
+    <!-- RQ3 -->
+    <div class="a4" style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:var(--shadow);display:flex;flex-direction:column;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:16px 16px 0 0;"></div>
+      <div style="font-family:'Playfair Display',serif;font-size:52px;font-weight:900;color:rgba(37,99,235,.07);position:absolute;top:6px;right:12px;line-height:1;">03</div>
+      <div style="width:38px;height:38px;border-radius:11px;background:rgba(37,99,235,.1);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px;">&#128260;</div>
+      <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:7px;">Sub-Q 3 &mdash; Debt Spiral</div>
+      <p style="font-size:12.5px;color:var(--muted);line-height:1.6;flex:1;">Are <strong>interest payments</strong> an independent cause or a lagged consequence of the fiscal deficit? Do they perpetuate a self-reinforcing debt spiral, or are they endogenous?</p>
+      <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--blue);">Model 2: &beta; = +0.062 &middot; p = 0.047 *</div>
     </div>
   </div>
 
-  <div style="margin-top:18px; background:rgba(230,57,70,0.06); border:1px solid rgba(230,57,70,0.25); border-radius:10px; padding:14px 20px; display:flex; align-items:center; gap:14px;">
-    <span style="font-size:20px;">⚠️</span>
+  <div class="a5" style="background:linear-gradient(135deg,#FFF7ED,#FFFBEB);border:1px solid #FDE68A;border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:12px;">
+    <span style="font-size:20px;">&#9888;&#65039;</span>
     <div>
-      <span style="font-size:11px; font-weight:600; letter-spacing:1.2px; text-transform:uppercase; color:#e63946;">Note on Secondary Question</span>
-      <p style="font-size:13px; color:var(--muted); margin-top:4px;">Whether fiscal deficit growth independently impacts interest rates was found <strong style="color:var(--light)">statistically insignificant</strong> (p &gt; 0.05) once the full model is estimated. Analysis was accordingly re-centred on the primary question.</p>
+      <span style="font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#92400E;">Note on Secondary Question</span>
+      <p style="font-size:13px;color:#78350F;margin-top:2px;">Whether fiscal deficit growth independently impacts <em>interest rates</em> was found <strong>statistically insignificant</strong> once the full model is estimated. Analysis was re-centred on the primary question.</p>
     </div>
   </div>
-  <div class="slide-number-tag">02 / 08</div>
 </div>
+<div class="wm">Quantitative Analysis &middot; Salini Gang</div>
+</div><!-- /s2 -->
 
 
-<!-- ══════════════════════════════════════════════════════
-     SLIDE 3 — DATA & VARIABLES
-══════════════════════════════════════════════════════ -->
+<!-- ======================== SLIDE 3 — DATA & VARIABLES ======================== -->
 <div class="slide" id="s3">
-  <div class="india-stripe"></div>
-  <div class="s3-left">
-    <div class="slide-tag">Data &amp; Sample</div>
-    <h2 class="section-title">Data Sources &amp; Variable Construction</h2>
-    <div class="accent-line"></div>
-
-    <div class="card" style="margin-bottom:16px;">
-      <div class="card-title">Data Source</div>
-      <p style="font-size:13px; color:var(--muted); line-height:1.6;">RBI <em>Handbook of Statistics on the Indian Economy</em> &amp; Ministry of Finance Union Budget Documents</p>
+<div class="sa"></div>
+<div class="hdr"><div class="hdr-logo">SG</div><span class="hdr-title">Methodology</span><div class="hdr-sep"></div><span class="hdr-tag">Data &amp; Variables</span><span class="hdr-num">03 / 08</span></div>
+<div class="ca" style="display:flex;flex-direction:row;">
+  <!-- Left -->
+  <div style="width:36%;display:flex;flex-direction:column;justify-content:center;padding:18px 36px 18px 42px;gap:13px;">
+    <div class="a1"><div class="chip">&#128194; Data Sources</div>
+      <div class="h3" style="margin-bottom:12px;">Sample &amp;<br>Variable Design</div>
     </div>
-    <div class="card" style="margin-bottom:16px;">
-      <div class="card-title">Time Period &amp; Sample Size</div>
-      <p style="font-size:13px; color:var(--muted); line-height:1.6;"><strong style="color:var(--light);">20 annual observations</strong><br>FY 2005–06 to FY 2024–25</p>
+    <div class="card a2" style="padding:15px 17px;">
+      <div style="font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;">Primary Sources</div>
+      <div style="font-size:13px;font-weight:600;color:var(--navy2);">RBI Handbook of Statistics &amp; Ministry of Finance Union Budget Documents</div>
     </div>
-    <div class="card">
-      <div class="card-title">Transformation</div>
-      <p style="font-size:13px; color:var(--muted); line-height:1.6;">All variables transformed via log-ratio: <span style="font-family:'JetBrains Mono',monospace; color:var(--gold); font-size:13px;">ln(X<sub>t</sub> / X<sub>t−1</sub>)</span> — equivalent to the continuous compound growth rate.</p>
+    <div class="card a3" style="padding:15px 17px;border-left:3px solid var(--saffron);border-radius:0 12px 12px 0;">
+      <div style="font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;">Sample Size &amp; Period</div>
+      <div style="font-size:16px;font-weight:800;color:var(--saffron);">N = 20 Annual Observations</div>
+      <div style="font-size:13px;font-weight:600;color:var(--navy2);">FY 2005&ndash;06 &rarr; FY 2024&ndash;25</div>
     </div>
-  </div>
-
-  <div class="s3-right">
-    <div class="slide-tag">Variable Table</div>
-    <table class="var-table">
-      <thead>
-        <tr>
-          <th>Variable</th>
-          <th>Role</th>
-          <th>Definition</th>
-          <th>Source</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>Gross Fiscal Deficit (GFD)</strong></td>
-          <td><span class="badge badge-dep">Dependent Y</span></td>
-          <td>Total expenditure minus total receipts (₹ crore)</td>
-          <td>RBI</td>
-        </tr>
-        <tr>
-          <td><strong>Total Tax Revenue (X₁)</strong></td>
-          <td><span class="badge badge-ind">Independent</span></td>
-          <td>Direct + indirect taxes net of states' share</td>
-          <td>RBI</td>
-        </tr>
-        <tr>
-          <td><strong>Interest Payments (X₂)</strong></td>
-          <td><span class="badge badge-ind">Independent</span></td>
-          <td>Interest on internal + external debt</td>
-          <td>RBI</td>
-        </tr>
-        <tr>
-          <td><strong>Subsidies (X₃)</strong></td>
-          <td><span class="badge badge-ind">Independent</span></td>
-          <td>Food, fuel, and fertiliser subsidies</td>
-          <td>RBI</td>
-        </tr>
-        <tr>
-          <td><strong>Capital Expenditure (X₄)</strong></td>
-          <td><span class="badge badge-ind">Independent</span></td>
-          <td>Govt. investment in physical assets</td>
-          <td>RBI</td>
-        </tr>
-        <tr>
-          <td><strong>Defence Expenditure (X₅)</strong></td>
-          <td><span class="badge badge-ind">Independent</span></td>
-          <td>Total defence spending allocation</td>
-          <td>MoF</td>
-        </tr>
-      </tbody>
-    </table>
-    <div style="margin-top:18px; font-size:12px; color:var(--slate); font-style:italic;">
-      Note: The 5-variable model (Adj. R² = 0.855) includes Defence Expenditure (X₅) and excludes Interest Payments as a predictor, per the conclusion specification.
+    <div class="a4" style="background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;border-radius:14px;padding:17px;box-shadow:var(--shadow-lg);">
+      <div style="font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;opacity:.55;margin-bottom:7px;">Log-Ratio Transformation</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--gold-lt);margin-bottom:7px;">ln(X<sub>t</sub> / X<sub>t&minus;1</sub>)</div>
+      <div style="font-size:11.5px;opacity:.7;line-height:1.5;">Ensures stationarity, scale normalisation, and elasticity-interpretable coefficients.</div>
     </div>
   </div>
-  <div class="slide-number-tag">03 / 08</div>
+
+  <!-- Right -->
+  <div style="width:64%;padding:18px 42px 18px 20px;display:flex;flex-direction:column;justify-content:center;">
+    <div class="chip a5">&#128203; Variable Definitions</div>
+    <div class="a6" style="background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);">
+      <table class="dt">
+        <thead>
+          <tr><th>Variable</th><th>Symbol</th><th>Role</th><th>Definition</th><th>Source</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Gross Fiscal Deficit</strong></td><td class="mono" style="font-size:12px;">GFD</td><td><span class="badge bdep">Dependent Y</span></td><td style="font-size:12px;color:var(--muted);">Total expenditure minus total receipts (&#8377; crore)</td><td style="font-size:12px;">RBI</td></tr>
+          <tr><td><strong>Total Tax Revenue</strong></td><td class="mono" style="font-size:12px;">X&#8321;</td><td><span class="badge bind">Independent</span></td><td style="font-size:12px;color:var(--muted);">Direct + indirect taxes net of states' share</td><td style="font-size:12px;">RBI</td></tr>
+          <tr><td><strong>Interest Payments</strong></td><td class="mono" style="font-size:12px;">X&#8322;</td><td><span class="badge bind">Independent</span></td><td style="font-size:12px;color:var(--muted);">Interest on internal + external debt</td><td style="font-size:12px;">RBI</td></tr>
+          <tr><td><strong>Subsidies</strong></td><td class="mono" style="font-size:12px;">X&#8323;</td><td><span class="badge bind">Independent</span></td><td style="font-size:12px;color:var(--muted);">Food, fuel, and fertiliser subsidies</td><td style="font-size:12px;">RBI</td></tr>
+          <tr><td><strong>Capital Expenditure</strong></td><td class="mono" style="font-size:12px;">X&#8324;</td><td><span class="badge bind">Independent</span></td><td style="font-size:12px;color:var(--muted);">Government investment in physical assets</td><td style="font-size:12px;">RBI</td></tr>
+          <tr><td><strong>Defence Expenditure</strong></td><td class="mono" style="font-size:12px;">X&#8325;</td><td><span class="badge bind">Independent</span></td><td style="font-size:12px;color:var(--muted);">Total defence spending allocation</td><td style="font-size:12px;">MoF</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="a7" style="font-size:11px;color:var(--muted2);font-style:italic;margin-top:8px;">* All variables log-ratio transformed prior to regression. Full model (Adj. R&sup2; = 0.855) includes Defence Expenditure.</p>
+  </div>
 </div>
+<div class="wm">Quantitative Analysis &middot; Salini Gang</div>
+</div><!-- /s3 -->
 
 
-<!-- ══════════════════════════════════════════════════════
-     SLIDE 4 — METHODOLOGY
-══════════════════════════════════════════════════════ -->
+<!-- ======================== SLIDE 4 — METHODOLOGY ======================== -->
 <div class="slide" id="s4">
-  <div class="india-stripe"></div>
-  <div class="slide-tag">Methodology</div>
-  <h2 class="section-title">Econometric Approach &amp; Specification</h2>
-  <p class="section-subtitle">Log-ratio transformation ensures stationarity and yields directly interpretable elasticity coefficients.</p>
+<div class="sa"></div>
+<div class="hdr"><div class="hdr-logo">SG</div><span class="hdr-title">Methodology</span><div class="hdr-sep"></div><span class="hdr-tag">Econometric Approach</span><span class="hdr-num">04 / 08</span></div>
+<div class="ca" style="display:flex;flex-direction:column;padding:22px 46px;gap:14px;">
+  <div class="a1">
+    <div class="chip">&#9881;&#65039; Specification</div>
+    <div class="h2" style="margin-bottom:4px;">Log-Ratio OLS Regression</div>
+    <p class="bmd">Transformation serves three econometric purposes; two models are estimated to isolate causality from endogeneity.</p>
+  </div>
 
-  <div class="method-row">
-    <div class="method-steps">
-      <div class="step-item">
-        <div class="step-num">1</div>
-        <p class="step-text"><strong>Stationarity:</strong> Removes the upward trend in absolute fiscal series, reducing spurious regression risk inherent in non-stationary time series.</p>
+  <div style="display:grid;grid-template-columns:1fr 1.5fr;gap:20px;flex:1;">
+    <!-- Steps -->
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="a2" style="display:flex;align-items:flex-start;gap:13px;">
+        <div style="min-width:33px;height:33px;background:linear-gradient(135deg,var(--saffron),var(--gold));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;box-shadow:0 3px 12px rgba(232,100,10,.3);">1</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.6;padding-top:6px;"><strong>Stationarity:</strong> Removes the upward trend in absolute fiscal series, reducing risk of spurious regression in non-stationary time series data.</p>
       </div>
-      <div class="step-item">
-        <div class="step-num">2</div>
-        <p class="step-text"><strong>Scale Normalisation:</strong> Makes variables comparable across years regardless of nominal GDP growth — ₹ crore figures are rendered dimensionless.</p>
+      <div class="a3" style="display:flex;align-items:flex-start;gap:13px;">
+        <div style="min-width:33px;height:33px;background:linear-gradient(135deg,var(--saffron),var(--gold));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;box-shadow:0 3px 12px rgba(232,100,10,.3);">2</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.6;padding-top:6px;"><strong>Scale Normalisation:</strong> Makes variables comparable across years regardless of nominal GDP growth &mdash; &#8377; crore figures are rendered dimensionless.</p>
       </div>
-      <div class="step-item">
-        <div class="step-num">3</div>
-        <p class="step-text"><strong>Interpretability:</strong> Coefficients represent <em>elasticities</em>: % change in GFD growth per 1% change in driver growth.</p>
+      <div class="a4" style="display:flex;align-items:flex-start;gap:13px;">
+        <div style="min-width:33px;height:33px;background:linear-gradient(135deg,var(--saffron),var(--gold));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;box-shadow:0 3px 12px rgba(232,100,10,.3);">3</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.6;padding-top:6px;"><strong>Interpretability:</strong> Coefficients represent <em>elasticities</em> &mdash; % change in GFD growth per 1% change in each driver's growth rate.</p>
       </div>
-      <div class="step-item">
-        <div class="step-num">4</div>
-        <p class="step-text"><strong>Two Models:</strong> Model 1 regresses GFD on all drivers; Model 2 reverses causality — regressing Interest Payments on GFD to test the debt spiral.</p>
+      <div class="a5" style="display:flex;align-items:flex-start;gap:13px;">
+        <div style="min-width:33px;height:33px;background:linear-gradient(135deg,var(--saffron),var(--gold));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;box-shadow:0 3px 12px rgba(232,100,10,.3);">4</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.6;padding-top:6px;"><strong>Two Models:</strong> Model 1 regresses GFD on all drivers; Model 2 reverses causality &mdash; regressing Interest Payments on GFD to test for the debt spiral.</p>
       </div>
     </div>
 
-    <div class="equation-box">
-      <div class="eq-label">Model 1 — Full Regression Equation</div>
-      <div class="eq-main">
-        ln(GFD<sub>t</sub>/GFD<sub>t−1</sub>) =<br>
-        &nbsp;&nbsp;<span class="coef-pos">β₀</span> + <span class="coef-neg">β₁</span>·ln(TaxRev<sub>t</sub>/TaxRev<sub>t−1</sub>)<br>
-        &nbsp;&nbsp;+ <span class="coef-pos">β₂</span>·ln(Interest<sub>t</sub>/Interest<sub>t−1</sub>)<br>
-        &nbsp;&nbsp;+ <span class="coef-pos">β₃</span>·ln(Subsidies<sub>t</sub>/Subsidies<sub>t−1</sub>)<br>
-        &nbsp;&nbsp;+ <span class="coef-neg">β₄</span>·ln(CapEx<sub>t</sub>/CapEx<sub>t−1</sub>)<br>
-        &nbsp;&nbsp;+ <span class="coef-pos">β₅</span>·ln(Defence<sub>t</sub>/Defence<sub>t−1</sub>) + ε<sub>t</sub>
+    <!-- Equation panel -->
+    <div class="ar" style="background:var(--navy);border-radius:16px;padding:24px 26px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow-lg);">
+      <div>
+        <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:4px;">Model 1 &mdash; Full Regression</div>
+        <div style="font-size:11.5px;font-weight:600;color:rgba(255,255,255,.75);margin-bottom:10px;">Gross Fiscal Deficit Drivers</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#E2E8F0;line-height:1.9;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:13px 15px;">
+          <span style="color:#FCD34D;">ln</span>(GFD<sub>t</sub>/GFD<sub>t&minus;1</sub>) =<br>
+          &nbsp;&nbsp;&beta;&#8320;<br>
+          &nbsp;&nbsp;<span style="color:#FCA5A5;">&minus; &beta;&#8321;</span>&middot;<span style="color:#93C5FD;">ln(TaxRev<sub>t</sub>/TaxRev<sub>t&minus;1</sub>)</span><br>
+          &nbsp;&nbsp;<span style="color:#86EFAC;">+ &beta;&#8322;</span>&middot;<span style="color:#93C5FD;">ln(Interest<sub>t</sub>/Interest<sub>t&minus;1</sub>)</span><br>
+          &nbsp;&nbsp;<span style="color:#86EFAC;">+ &beta;&#8323;</span>&middot;<span style="color:#93C5FD;">ln(Subsidies<sub>t</sub>/Subsidies<sub>t&minus;1</sub>)</span><br>
+          &nbsp;&nbsp;<span style="color:#FCA5A5;">&minus; &beta;&#8324;</span>&middot;<span style="color:#93C5FD;">ln(CapEx<sub>t</sub>/CapEx<sub>t&minus;1</sub>)</span><br>
+          &nbsp;&nbsp;<span style="color:#86EFAC;">+ &beta;&#8325;</span>&middot;<span style="color:#93C5FD;">ln(Defence<sub>t</sub>/Defence<sub>t&minus;1</sub>)</span> + &epsilon;<sub>t</sub>
+        </div>
       </div>
-      <hr class="eq-divider">
-      <div class="eq-label">Model 2 — Reverse Regression (Debt Spiral Test)</div>
-      <div class="eq-main">
-        ln(Interest<sub>t</sub>/Interest<sub>t−1</sub>) =<br>
-        &nbsp;&nbsp;<span class="coef-pos">β₀</span> + <span class="coef-pos">β₁</span>·ln(GFD<sub>t</sub>/GFD<sub>t−1</sub>) + ε<sub>t</sub>
+      <hr style="border:none;border-top:1px solid rgba(255,255,255,.1);">
+      <div>
+        <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:4px;">Model 2 &mdash; Reverse Regression</div>
+        <div style="font-size:11.5px;font-weight:600;color:rgba(255,255,255,.75);margin-bottom:10px;">Interest Payment Growth &larr; Fiscal Deficit Growth</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#E2E8F0;line-height:1.9;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:13px 15px;">
+          <span style="color:#FCD34D;">ln</span>(Interest<sub>t</sub>/Interest<sub>t&minus;1</sub>) = &beta;&#8320; <span style="color:#86EFAC;">+ &beta;&#8321;</span>&middot;<span style="color:#93C5FD;">ln(GFD<sub>t</sub>/GFD<sub>t&minus;1</sub>)</span> + &epsilon;<sub>t</sub>
+        </div>
       </div>
-      <hr class="eq-divider">
-      <div class="eq-note">All variables sourced from RBI; N = 20 annual observations (FY 2005–06 to 2024–25)</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.3);text-align:center;">N = 20 &middot; RBI &amp; MoF &middot; FY 2005&ndash;06 to 2024&ndash;25</div>
     </div>
   </div>
-  <div class="slide-number-tag">04 / 08</div>
 </div>
+<div class="wm">Quantitative Analysis &middot; Salini Gang</div>
+</div><!-- /s4 -->
 
 
-<!-- ══════════════════════════════════════════════════════
-     SLIDE 5 — MODEL 1 RESULTS
-══════════════════════════════════════════════════════ -->
+<!-- ======================== SLIDE 5 — MODEL 1 RESULTS ======================== -->
 <div class="slide" id="s5">
-  <div class="india-stripe"></div>
-  <div class="s5-left">
-    <div class="slide-tag">Regression Results</div>
-    <h2 class="section-title">Model 1: Drivers of Fiscal Deficit</h2>
-    <div class="accent-line"></div>
+<div class="sa"></div>
+<div class="hdr"><div class="hdr-logo">SG</div><span class="hdr-title">Regression Results</span><div class="hdr-sep"></div><span class="hdr-tag">Model 1 &mdash; GFD Drivers</span><span class="hdr-num">05 / 08</span></div>
+<div class="ca" style="display:flex;flex-direction:row;">
+  <!-- Left -->
+  <div style="width:40%;padding:18px 34px 18px 42px;display:flex;flex-direction:column;justify-content:center;gap:13px;">
+    <div class="a1"><div class="chip">&#128208; Model 1 Performance</div>
+      <div class="h3" style="margin-bottom:12px;">Gross Fiscal Deficit<br>Regression Results</div>
+    </div>
 
-    <div class="stat-grid">
-      <div class="stat-box">
-        <div class="stat-val">0.855</div>
-        <div class="stat-lbl">Adjusted R²</div>
+    <div class="a2" style="display:grid;grid-template-columns:1fr 1fr;gap:11px;">
+      <div class="card" style="padding:13px 15px;text-align:center;">
+        <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--saffron);">0.855</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px;">Adjusted R&sup2;</div>
       </div>
-      <div class="stat-box">
-        <div class="stat-val">20.06</div>
-        <div class="stat-lbl">F-Statistic</div>
+      <div class="card" style="padding:13px 15px;text-align:center;">
+        <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--navy2);">20.06</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px;">F-Statistic</div>
       </div>
-      <div class="stat-box">
-        <div class="stat-val">&lt;0.001</div>
-        <div class="stat-lbl">Model p-value</div>
+      <div class="card" style="padding:13px 15px;text-align:center;">
+        <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--india-green);">&lt;0.001</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px;">p-value (Model)</div>
       </div>
-      <div class="stat-box">
-        <div class="stat-val">20</div>
-        <div class="stat-lbl">Observations (N)</div>
+      <div class="card" style="padding:13px 15px;text-align:center;">
+        <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--blue);">20</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px;">Observations</div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-title">Final Estimated Equation</div>
-      <p style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--light); line-height:1.8;">
-        Δln GFD = 0.035<br>
-        − <span style="color:var(--teal)">1.647</span>·ΔlnTaxRev<br>
-        + <span style="color:#e8b84b">1.298</span>·ΔlnInterest<br>
-        + <span style="color:#e8b84b">0.550</span>·ΔlnSubsidies<br>
-        − <span style="color:var(--teal)">0.436</span>·ΔlnCapEx
-      </p>
-    </div>
-  </div>
-
-  <div class="s5-right">
-    <div class="slide-tag" style="margin-bottom:14px;">Coefficient Summary</div>
-    <table class="coef-table">
-      <thead>
-        <tr>
-          <th>Variable</th>
-          <th>β Coef.</th>
-          <th>p-value</th>
-          <th>Significance</th>
-          <th>Effect</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Subsidies (X₃)</td>
-          <td class="pos">+0.550</td>
-          <td>0.0002 <span class="sig-star">***</span></td>
-          <td><span class="sig-badge sig-yes">Significant</span></td>
-          <td>
-            <div class="bar-track"><div class="bar-fill-pos" style="width:55%"></div></div>
-          </td>
-        </tr>
-        <tr>
-          <td>Tax Revenue (X₁)</td>
-          <td class="neg">−1.647</td>
-          <td>0.012 <span class="sig-star">**</span></td>
-          <td><span class="sig-badge sig-yes">Significant</span></td>
-          <td>
-            <div class="bar-track"><div class="bar-fill-neg" style="width:80%"></div></div>
-          </td>
-        </tr>
-        <tr>
-          <td>Capital Expenditure (X₄)</td>
-          <td class="neg">−0.436</td>
-          <td>0.050 <span class="sig-star">*</span></td>
-          <td><span class="sig-badge sig-yes">Significant</span></td>
-          <td>
-            <div class="bar-track"><div class="bar-fill-neg" style="width:44%"></div></div>
-          </td>
-        </tr>
-        <tr>
-          <td>Defence Expenditure (X₅)</td>
-          <td class="pos">+2.260</td>
-          <td>0.022 <span class="sig-star">**</span></td>
-          <td><span class="sig-badge sig-yes">Significant</span></td>
-          <td>
-            <div class="bar-track"><div class="bar-fill-pos" style="width:90%"></div></div>
-          </td>
-        </tr>
-        <tr>
-          <td>Interest Payments (X₂)</td>
-          <td class="ns">+1.298</td>
-          <td>0.143</td>
-          <td><span class="sig-badge sig-no">Not Sig.</span></td>
-          <td>
-            <div class="bar-track"><div class="bar-fill-pos" style="width:30%; opacity:0.3"></div></div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div style="margin-top:18px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-      <div style="background:rgba(42,157,143,0.08); border:1px solid rgba(42,157,143,0.3); border-radius:10px; padding:14px;">
-        <div style="font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--teal); margin-bottom:6px;">Largest Stabiliser</div>
-        <div style="font-size:13.5px; font-weight:600; color:var(--light);">Tax Revenue (β = −1.647)</div>
-        <div style="font-size:12px; color:var(--muted); margin-top:4px;">Greater-than-proportionate deficit reduction per unit of tax growth</div>
-      </div>
-      <div style="background:rgba(200,146,42,0.08); border:1px solid rgba(200,146,42,0.3); border-radius:10px; padding:14px;">
-        <div style="font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); margin-bottom:6px;">Primary Driver</div>
-        <div style="font-size:13.5px; font-weight:600; color:var(--light);">Subsidies (β = +0.550)</div>
-        <div style="font-size:12px; color:var(--muted); margin-top:4px;">Most consistent &amp; robust finding across all model specifications</div>
+    <div class="a3" style="background:var(--navy);border-radius:13px;padding:15px 17px;box-shadow:var(--shadow-lg);">
+      <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:.5;color:#fff;margin-bottom:7px;">Final Estimated Equation</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.85;color:#E2E8F0;">
+        &Delta;ln GFD = <span style="color:#FCD34D;">0.035</span><br>
+        &nbsp;&nbsp;<span style="color:#FCA5A5;">&minus; 1.647</span>&middot;&Delta;lnTaxRev<br>
+        &nbsp;&nbsp;<span style="color:#86EFAC;">+ 1.298</span>&middot;&Delta;lnInterest<br>
+        &nbsp;&nbsp;<span style="color:#86EFAC;">+ 0.550</span>&middot;&Delta;lnSubsidies<br>
+        &nbsp;&nbsp;<span style="color:#FCA5A5;">&minus; 0.436</span>&middot;&Delta;lnCapEx<br>
+        &nbsp;&nbsp;<span style="color:#86EFAC;">+ 2.260</span>&middot;&Delta;lnDefence
       </div>
     </div>
   </div>
-  <div class="slide-number-tag">05 / 08</div>
+
+  <!-- Right -->
+  <div style="width:60%;padding:18px 42px 18px 26px;display:flex;flex-direction:column;justify-content:center;gap:13px;">
+    <div class="chip a4">&#128202; Coefficient Summary</div>
+
+    <div class="a5" style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:0 0 0 0;box-shadow:var(--shadow);overflow:hidden;">
+      <table style="width:100%;border-collapse:separate;border-spacing:0;">
+        <thead>
+          <tr>
+            <th style="font-size:9.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:9px 12px;border-bottom:2px solid var(--border);background:var(--bg2);text-align:left;border-radius:14px 0 0 0;">Variable</th>
+            <th style="font-size:9.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:9px 12px;border-bottom:2px solid var(--border);background:var(--bg2);text-align:left;">&beta; Coef.</th>
+            <th style="font-size:9.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:9px 12px;border-bottom:2px solid var(--border);background:var(--bg2);text-align:left;">p-value</th>
+            <th style="font-size:9.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:9px 12px;border-bottom:2px solid var(--border);background:var(--bg2);text-align:left;">Significance</th>
+            <th style="font-size:9.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:9px 12px;border-bottom:2px solid var(--border);background:var(--bg2);text-align:left;border-radius:0 14px 0 0;">Direction</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:rgba(232,100,10,.04);">
+            <td style="padding:9px 12px;font-size:12.5px;font-weight:600;color:var(--text2);border-bottom:1px solid var(--border);">Subsidies (X&#8323;)</td>
+            <td style="padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--saffron);border-bottom:1px solid var(--border);">+0.550</td>
+            <td style="padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;border-bottom:1px solid var(--border);">0.0002 <span style="color:var(--saffron);">***</span></td>
+            <td style="padding:9px 12px;border-bottom:1px solid var(--border);"><span class="badge bsig">&#9733; Primary Driver</span></td>
+            <td style="padding:9px 12px;font-size:12px;color:var(--saffron);font-weight:600;border-bottom:1px solid var(--border);">&uarr; Deficit</td>
+          </tr>
+          <tr>
+            <td style="padding:9px 12px;font-size:12.5px;font-weight:600;color:var(--text2);border-bottom:1px solid var(--border);">Defence Exp. (X&#8325;)</td>
+            <td style="padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--saffron);border-bottom:1px solid var(--border);">+2.260</td>
+            <td style="padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;border-bottom:1px solid var(--border);">0.022 <span style="color:var(--saffron);">**</span></td>
+            <td style="padding:9px 12px;border-bottom:1px solid var(--border);"><span class="badge bsig">Significant</span></td>
+            <td style="padding:9px 12px;font-size:12px;color:var(--saffron);font-weight:600;border-bottom:1px solid var(--border);">&uarr; Deficit</td>
+          </tr>
+          <tr style="background:rgba(19,136,8,.03);">
+            <td style="padding:9px 12px;font-size:12.5px;font-weight:600;color:var(--text2);border-bottom:1px solid var(--border);">Tax Revenue (X&#8321;)</td>
+            <td style="padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--india-green);border-bottom:1px solid var(--border);">&minus;1.647</td>
+            <td style="padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;border-bottom:1px solid var(--border);">0.012 <span style="color:var(--india-green);">**</span></td>
+            <td style="padding:9px 12px;border-bottom:1px solid var(--border);"><span class="badge bsig">&#9733; Stabiliser</span></td>
+            <td style="padding:9px 12px;font-size:12px;color:var(--india-green);font-weight:600;border-bottom:1px solid var(--border);">&darr; Deficit</td>
+          </tr>
+          <tr>
+            <td style="padding:9px 12px;font-size:12.5px;font-weight:600;color:var(--text2);border-bottom:1px solid var(--border);">Capital Exp. (X&#8324;)</td>
+            <td style="padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--india-green);border-bottom:1px solid var(--border);">&minus;0.436</td>
+            <td style="padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;border-bottom:1px solid var(--border);">0.050 <span style="color:var(--india-green);">*</span></td>
+            <td style="padding:9px 12px;border-bottom:1px solid var(--border);"><span class="badge bsig">Significant</span></td>
+            <td style="padding:9px 12px;font-size:12px;color:var(--india-green);font-weight:600;border-bottom:1px solid var(--border);">&darr; Deficit</td>
+          </tr>
+          <tr>
+            <td style="padding:9px 12px;font-size:12.5px;color:var(--muted);">Interest Pay. (X&#8322;)</td>
+            <td style="padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted2);">+1.298</td>
+            <td style="padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);">0.143</td>
+            <td style="padding:9px 12px;"><span class="badge bns">Not Sig.</span></td>
+            <td style="padding:9px 12px;font-size:12px;color:var(--muted2);">Endogenous</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Effect bars -->
+    <div class="card a6" style="padding:15px 17px;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:11px;">Effect Magnitude (Standardised)</div>
+      <div class="cr"><span class="clbl">Defence (X&#8325;)</span><div class="ctrk"><div class="cbar cpos" style="width:90%;"></div></div><span class="cval vp">+2.260</span></div>
+      <div class="cr"><span class="clbl">Tax Revenue (X&#8321;)</span><div class="ctrk"><div class="cbar cneg" style="width:82%;"></div></div><span class="cval vn">&minus;1.647</span></div>
+      <div class="cr"><span class="clbl">Subsidies (X&#8323;)</span><div class="ctrk"><div class="cbar cpos" style="width:55%;"></div></div><span class="cval vp">+0.550</span></div>
+      <div class="cr"><span class="clbl">Capital Exp. (X&#8324;)</span><div class="ctrk"><div class="cbar cneg" style="width:44%;"></div></div><span class="cval vn">&minus;0.436</span></div>
+      <div class="cr" style="margin-bottom:0;"><span class="clbl" style="color:var(--muted2);">Interest (X&#8322;)</span><div class="ctrk"><div class="cbar" style="width:25%;background:#D1D5DB;"></div></div><span class="cval vns">n.s.</span></div>
+    </div>
+  </div>
 </div>
+<div class="wm">Quantitative Analysis &middot; Salini Gang</div>
+</div><!-- /s5 -->
 
 
-<!-- ══════════════════════════════════════════════════════
-     SLIDE 6 — MODEL 2 / DEBT SPIRAL
-══════════════════════════════════════════════════════ -->
+<!-- ======================== SLIDE 6 — MODEL 2 / DEBT SPIRAL ======================== -->
 <div class="slide" id="s6">
-  <div class="india-stripe"></div>
-  <div class="slide-tag">Debt Cycle Analysis</div>
-  <h2 class="section-title">Model 2: The Debt Spiral Mechanism</h2>
-  <p class="section-subtitle">Reverse regression tests whether fiscal deficit growth independently predicts interest payment growth — the key endogeneity question.</p>
+<div class="sa"></div>
+<div class="hdr"><div class="hdr-logo">SG</div><span class="hdr-title">Regression Results</span><div class="hdr-sep"></div><span class="hdr-tag">Model 2 &mdash; Debt Cycle</span><span class="hdr-num">06 / 08</span></div>
+<div class="ca" style="display:flex;flex-direction:column;padding:20px 46px;gap:14px;">
+  <div class="a1">
+    <div class="chip b">&#128260; Endogeneity Test</div>
+    <div class="h2" style="margin-bottom:4px;">Model 2: The Debt Spiral Mechanism</div>
+    <p class="bmd">Reverse regression tests whether fiscal deficit growth <em>independently</em> predicts interest payment growth &mdash; the key endogeneity question.</p>
+  </div>
 
-  <div class="spiral-grid">
-    <div class="spiral-left">
-      <div class="finding-card highlight">
-        <div class="fc-title">Model 2 — Reverse Regression Results</div>
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:8px;">
-          <div style="text-align:center;">
-            <div style="font-family:'Playfair Display',serif; font-size:26px; font-weight:700; color:var(--gold);">0.062</div>
-            <div style="font-size:11px; color:var(--muted);">β coefficient</div>
-          </div>
-          <div style="text-align:center;">
-            <div style="font-family:'Playfair Display',serif; font-size:26px; font-weight:700; color:var(--gold);">0.047</div>
-            <div style="font-size:11px; color:var(--muted);">p-value</div>
-          </div>
-          <div style="text-align:center;">
-            <div style="font-family:'Playfair Display',serif; font-size:26px; font-weight:700; color:var(--gold);">15.7%</div>
-            <div style="font-size:11px; color:var(--muted);">Var. explained (R²)</div>
-          </div>
-        </div>
-        <div class="fc-body" style="margin-top:12px;">
-          95% CI: <strong>[0.001, 0.123]</strong> — entirely above zero. Confirms that faster fiscal deficit growth predicts faster subsequent interest payment growth.
+  <div style="display:grid;grid-template-columns:1.1fr 0.9fr;gap:20px;flex:1;">
+    <!-- Left -->
+    <div style="display:flex;flex-direction:column;gap:13px;">
+      <div class="a2" style="background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;border-radius:14px;padding:17px 20px;box-shadow:var(--shadow-lg);">
+        <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:.55;margin-bottom:9px;">Model 2 &mdash; Reverse Regression Results</div>
+        <div style="display:flex;gap:14px;">
+          <div style="flex:1;text-align:center;"><div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--gold-lt);line-height:1;">0.062</div><div style="font-size:10px;opacity:.65;margin-top:3px;">&beta; coefficient</div></div>
+          <div style="flex:1;text-align:center;"><div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--gold-lt);line-height:1;">0.047</div><div style="font-size:10px;opacity:.65;margin-top:3px;">p-value *</div></div>
+          <div style="flex:1;text-align:center;"><div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--gold-lt);line-height:1;">15.7%</div><div style="font-size:10px;opacity:.65;margin-top:3px;">Var. explained</div></div>
+          <div style="flex:1;text-align:center;"><div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--gold-lt);line-height:1;">4.535</div><div style="font-size:10px;opacity:.65;margin-top:3px;">F-statistic</div></div>
         </div>
       </div>
-      <div class="finding-card">
-        <div class="fc-title">Key Endogeneity Finding</div>
-        <div class="fc-body">Interest payments are <strong>individually significant</strong> in Model 1 (β = 0.201, p = 0.047) but <strong>lose all significance</strong> in the full model (p = 0.143). This reveals that interest payments are endogenous — a <em>consequence</em> of past borrowing, not an independent cause of the deficit.</div>
+
+      <div class="a3" style="background:linear-gradient(135deg,rgba(19,136,8,.06),rgba(22,163,74,.06));border:1px solid rgba(19,136,8,.25);border-radius:12px;padding:13px 16px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--india-green);margin-bottom:6px;">95% Confidence Interval &mdash; Entirely Above Zero</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--navy2);line-height:1.7;">&Delta;ln Interest = &minus;0.0005 + 0.062&middot;&Delta;ln GFD + &epsilon;<br>CI: [0.001, 0.123] &nbsp;&rarr;&nbsp; &beta; &gt; 0 confirmed</div>
+      </div>
+
+      <div class="card a4" style="padding:15px 17px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--saffron);margin-bottom:8px;">Key Endogeneity Finding</div>
+        <p style="font-size:12.5px;color:var(--text2);line-height:1.6;">Interest payments are <strong>individually significant</strong> in simple regression (p = 0.047) but <strong>lose all significance</strong> in the full model (p = 0.143). They are endogenous &mdash; the lagged invoice of past borrowing, not an independent driver. <em>Debt management alone cannot fix an expenditure-driven deficit.</em></p>
       </div>
     </div>
 
-    <div class="spiral-right">
-      <div class="cycle-box">
-        <div style="font-size:11px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); margin-bottom:6px;">The Self-Reinforcing Cycle</div>
-        <div class="cycle-step">
-          <strong style="color:var(--gold);">Expenditure-Driven Deficit</strong><br>
-          <span style="font-size:11px; color:var(--muted);">Subsidies &amp; defence growth exceed revenue</span>
+    <!-- Cycle diagram -->
+    <div style="display:flex;flex-direction:column;gap:13px;">
+      <div class="a5" style="text-align:center;"><div class="chip">&#128260; Self-Reinforcing Cycle</div></div>
+      <div class="a6" style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;">
+        <div style="width:100%;padding:9px 14px;border-radius:10px;text-align:center;font-size:12px;font-weight:600;background:rgba(232,100,10,.1);border:2px solid var(--saffron);color:var(--saffron);">
+          <strong>Expenditure-Driven Deficit</strong><br>
+          <span style="font-size:11px;font-weight:400;">Subsidies &amp; defence exceed revenue</span>
         </div>
-        <div class="cycle-arrow">↓</div>
-        <div class="cycle-step">
-          <strong style="color:var(--light);">Government Borrows</strong><br>
-          <span style="font-size:11px; color:var(--muted);">Debt stock accumulates over time</span>
+        <div style="font-size:22px;color:var(--saffron);font-weight:900;line-height:1;">&#8595;</div>
+        <div style="width:100%;padding:9px 14px;border-radius:10px;text-align:center;font-size:12px;font-weight:600;background:rgba(30,58,95,.08);border:2px solid var(--navy2);color:var(--navy2);">
+          <strong>Government Borrows</strong><br>
+          <span style="font-size:11px;font-weight:400;">Debt stock accumulates</span>
         </div>
-        <div class="cycle-arrow">↓</div>
-        <div class="cycle-step">
-          <strong style="color:var(--light);">Interest Obligations Rise</strong><br>
-          <span style="font-size:11px; color:var(--muted);">β = +0.062, p = 0.047 confirmed</span>
+        <div style="font-size:22px;color:var(--saffron);font-weight:900;line-height:1;">&#8595;</div>
+        <div style="width:100%;padding:9px 14px;border-radius:10px;text-align:center;font-size:12px;font-weight:600;background:rgba(19,136,8,.08);border:2px solid var(--india-green);color:var(--india-green);">
+          <strong>Interest Obligations Rise</strong><br>
+          <span style="font-size:11px;font-weight:400;">&beta; = +0.062, p = 0.047 confirmed</span>
         </div>
-        <div class="cycle-arrow">↓</div>
-        <div class="cycle-step">
-          <strong style="color:var(--light);">Total Expenditure Increases</strong><br>
-          <span style="font-size:11px; color:var(--muted);">Interest feeds back into expenditure base</span>
+        <div style="font-size:22px;color:var(--saffron);font-weight:900;line-height:1;">&#8595;</div>
+        <div style="width:100%;padding:9px 14px;border-radius:10px;text-align:center;font-size:12px;font-weight:600;background:rgba(30,58,95,.08);border:2px solid var(--navy2);color:var(--navy2);">
+          <strong>Total Expenditure Increases</strong><br>
+          <span style="font-size:11px;font-weight:400;">Interest feeds back into expenditure</span>
         </div>
-        <div class="cycle-arrow">↺</div>
-        <div style="font-size:11.5px; color:var(--muted); text-align:center; font-style:italic;">Cycle perpetuates — but <strong style="color:var(--gold);">not self-originating</strong>;<br>driven by expenditure composition at root</div>
+        <div style="font-size:26px;color:var(--saffron);font-weight:900;line-height:1;">&#8635;</div>
+        <div style="font-size:11.5px;color:var(--muted);text-align:center;font-style:italic;padding:0 10px;">Cycle perpetuates &mdash; but <strong style="color:var(--saffron);">not self-originating</strong>;<br>root cause is expenditure composition</div>
       </div>
     </div>
   </div>
-  <div class="slide-number-tag">06 / 08</div>
 </div>
+<div class="wm">Quantitative Analysis &middot; Salini Gang</div>
+</div><!-- /s6 -->
 
 
-<!-- ══════════════════════════════════════════════════════
-     SLIDE 7 — KEY FINDINGS SUMMARY
-══════════════════════════════════════════════════════ -->
+<!-- ======================== SLIDE 7 — KEY FINDINGS ======================== -->
 <div class="slide" id="s7">
-  <div class="india-stripe"></div>
-  <div class="slide-tag">Key Findings</div>
-  <h2 class="section-title">Summary of Empirical Findings</h2>
-  <p class="section-subtitle" style="margin-bottom:0;">Four robust conclusions emerge from twenty years of Central Government data.</p>
+<div class="sa"></div>
+<div class="hdr"><div class="hdr-logo">SG</div><span class="hdr-title">Summary of Results</span><div class="hdr-sep"></div><span class="hdr-tag">Key Findings</span><span class="hdr-num">07 / 08</span></div>
+<div class="ca" style="display:flex;flex-direction:column;padding:20px 46px;gap:14px;">
+  <div class="a1">
+    <div class="chip">&#127942; Empirical Results</div>
+    <div class="h2" style="margin-bottom:4px;">Four Robust Empirical Findings</div>
+    <p class="bmd">Twenty years of Central Government data yield four clear, policy-relevant conclusions.</p>
+  </div>
 
-  <div class="findings-grid">
-    <div class="finding-big f1">
-      <div class="fb-icon">📈</div>
-      <div class="fb-title">Finding 1: Subsidies are the Primary Expenditure Driver</div>
-      <div class="fb-body">Subsidy growth is the single most significant driver of fiscal deficit growth, consistent and robust across all model specifications. Each percentage point acceleration in subsidy spending produces a near-equivalent deterioration in the deficit.</div>
-      <div class="fb-stat">β = +0.550 · p = 0.0002 · sig. at 0.1% level</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:14px;flex:1;">
+    <div class="a2" style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);display:flex;flex-direction:column;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--saffron),var(--gold-lt));border-radius:14px 14px 0 0;"></div>
+      <div style="position:absolute;top:10px;right:12px;font-family:'Playfair Display',serif;font-size:46px;font-weight:900;opacity:.05;color:var(--navy);line-height:1;">01</div>
+      <div style="font-size:22px;margin-bottom:8px;">&#128200;</div>
+      <div style="font-size:13.5px;font-weight:700;color:var(--navy);margin-bottom:7px;">Subsidies are the Primary Expenditure Driver</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.6;flex:1;">The single most statistically significant and robust driver of fiscal deficit growth. Each percentage point acceleration in subsidy spending produces a near-equivalent deterioration in the deficit.</p>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;margin-top:9px;padding-top:9px;border-top:1px solid var(--border);color:var(--saffron);">&beta; = +0.550 &middot; p = 0.0002 *** &middot; Sig. at 0.1%</div>
     </div>
-    <div class="finding-big f2">
-      <div class="fb-icon">💰</div>
-      <div class="fb-title">Finding 2: Tax Revenue is the Primary Stabilising Force</div>
-      <div class="fb-body">Tax revenue growth is the dominant stabiliser, with a greater-than-proportionate negative effect on deficit growth, reflecting India's improving tax compliance strength and the broadening of the tax base over the study period.</div>
-      <div class="fb-stat">β = −1.647 · p = 0.012 · sig. at 5% level</div>
+    <div class="a3" style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);display:flex;flex-direction:column;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--india-green),#4ADE80);border-radius:14px 14px 0 0;"></div>
+      <div style="position:absolute;top:10px;right:12px;font-family:'Playfair Display',serif;font-size:46px;font-weight:900;opacity:.05;color:var(--navy);line-height:1;">02</div>
+      <div style="font-size:22px;margin-bottom:8px;">&#128176;</div>
+      <div style="font-size:13.5px;font-weight:700;color:var(--navy);margin-bottom:7px;">Tax Revenue is the Primary Stabilising Force</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.6;flex:1;">Greater-than-proportionate negative effect on deficit growth (elasticity &gt; 1). Reflects India's improving tax compliance and the broadening of the direct tax base over the study period.</p>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;margin-top:9px;padding-top:9px;border-top:1px solid var(--border);color:var(--india-green);">&beta; = &minus;1.647 &middot; p = 0.012 ** &middot; Sig. at 5%</div>
     </div>
-    <div class="finding-big f3">
-      <div class="fb-icon">🏗️</div>
-      <div class="fb-title">Finding 3: Capital Expenditure is Dynamically Self-Correcting</div>
-      <div class="fb-body">Capital expenditure growth is associated with <em>fiscal improvement</em>, validating the multiplier hypothesis — productive investment generates GDP and tax revenue growth that offsets its direct cost. Post-COVID capex expansion is not fiscally reckless.</div>
-      <div class="fb-stat">β = −0.436 · p = 0.050 · sig. at 5% level</div>
+    <div class="a4" style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);display:flex;flex-direction:column;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:14px 14px 0 0;"></div>
+      <div style="position:absolute;top:10px;right:12px;font-family:'Playfair Display',serif;font-size:46px;font-weight:900;opacity:.05;color:var(--navy);line-height:1;">03</div>
+      <div style="font-size:22px;margin-bottom:8px;">&#127959;</div>
+      <div style="font-size:13.5px;font-weight:700;color:var(--navy);margin-bottom:7px;">Capital Expenditure is Dynamically Self-Correcting</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.6;flex:1;">Associated with fiscal improvement, validating the GDP multiplier hypothesis. Productive investment generates tax revenue that offsets its direct cost &mdash; post-COVID capex expansion is empirically justified.</p>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;margin-top:9px;padding-top:9px;border-top:1px solid var(--border);color:var(--blue);">&beta; = &minus;0.436 &middot; p = 0.050 * &middot; Self-financing validated</div>
     </div>
-    <div class="finding-big f4">
-      <div class="fb-icon">🔗</div>
-      <div class="fb-title">Finding 4: Interest Payments are Endogenous — Not Causal</div>
-      <div class="fb-body">Interest payments are significant in isolation but lose all explanatory power in the full model. They are the <em>transmission mechanism</em> of the debt spiral — a lagged invoice of past borrowing — not its originating cause. Debt management alone cannot fix the deficit.</div>
-      <div class="fb-stat">Model 1: p = 0.143 (n.s.) · Model 2: β = +0.062, p = 0.047</div>
+    <div class="a5" style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);display:flex;flex-direction:column;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--red),#F97316);border-radius:14px 14px 0 0;"></div>
+      <div style="position:absolute;top:10px;right:12px;font-family:'Playfair Display',serif;font-size:46px;font-weight:900;opacity:.05;color:var(--navy);line-height:1;">04</div>
+      <div style="font-size:22px;margin-bottom:8px;">&#128279;</div>
+      <div style="font-size:13.5px;font-weight:700;color:var(--navy);margin-bottom:7px;">Interest Payments are Endogenous &mdash; Not Causal</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.6;flex:1;">Significant in isolation but lose all power in the full model. They are the transmission mechanism of the debt spiral &mdash; the lagged invoice of past expenditure decisions &mdash; not the originating cause.</p>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;margin-top:9px;padding-top:9px;border-top:1px solid var(--border);color:var(--red);">Full model: p = 0.143 (n.s.) &middot; Reverse: &beta; = +0.062, p = 0.047</div>
     </div>
   </div>
-  <div class="slide-number-tag">07 / 08</div>
 </div>
+<div class="wm">Quantitative Analysis &middot; Salini Gang</div>
+</div><!-- /s7 -->
 
 
-<!-- ══════════════════════════════════════════════════════
-     SLIDE 8 — CONCLUSION & POLICY
-══════════════════════════════════════════════════════ -->
+<!-- ======================== SLIDE 8 — CONCLUSION ======================== -->
 <div class="slide" id="s8">
-  <div class="india-stripe"></div>
-  <div class="corner-deco" style="bottom:-60px;right:-40px;"></div>
-
-  <div class="s8-left">
-    <div class="slide-tag">Conclusion</div>
-    <h2 class="section-title" style="font-size:34px;">India's fiscal deficit is not a revenue failure — it is an expenditure composition problem.</h2>
-    <div class="accent-line" style="margin-top:14px;"></div>
-
-    <p class="conclusion-quote">
-      "Fiscal consolidation in India requires not less spending, but <em>better-composed spending</em> — aggressively slowing unproductive expenditure while sustaining capital investment."
-    </p>
-
-    <div class="takeaway-row">
-      <div class="takeaway-item">
-        <div class="ti-val">85.5%</div>
-        <div class="ti-lbl">Variation Explained (Adj. R²)</div>
+<div class="sa"></div>
+<div style="position:absolute;inset:0;background:radial-gradient(ellipse 600px 500px at 0% 50%,rgba(19,136,8,.05) 0%,transparent 70%),radial-gradient(ellipse 700px 600px at 100% 30%,rgba(232,100,10,.06) 0%,transparent 70%),var(--bg);"></div>
+<div class="hdr" style="left:6px;"><div class="hdr-logo">SG</div><span class="hdr-title">Conclusion &amp; Policy</span><div class="hdr-sep"></div><span class="hdr-tag">Policy Implications</span><span class="hdr-num">08 / 08</span></div>
+<div class="ca" style="display:flex;flex-direction:row;position:relative;z-index:1;">
+  <!-- Left -->
+  <div style="width:52%;padding:8px 40px 10px 48px;display:flex;flex-direction:column;justify-content:center;">
+    <div class="a1"><div class="chip">&#127919; Central Finding</div>
+      <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--navy);line-height:1.25;margin-bottom:0;">
+        India's fiscal deficit is not a<br>
+        <span style="background:linear-gradient(135deg,var(--india-green),var(--green2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">revenue failure</span> &mdash;<br>
+        it is an <span style="color:var(--saffron);">expenditure composition</span> problem.
       </div>
-      <div class="takeaway-item">
-        <div class="ti-val">4.75%</div>
-        <div class="ti-lbl">GDP — Deficit Ratio, FY 2024–25</div>
+    </div>
+
+    <div class="a2" style="background:linear-gradient(135deg,rgba(232,100,10,.05),rgba(217,119,6,.05));border-left:4px solid var(--saffron);border-radius:0 12px 12px 0;padding:14px 18px;margin:14px 0 18px;">
+      <p style="font-family:'Playfair Display',serif;font-size:16px;font-style:italic;color:var(--navy);line-height:1.6;">"Fiscal consolidation in India requires not less spending, but <em>better-composed spending</em> &mdash; aggressively slowing unproductive expenditure while sustaining capital investment."</p>
+    </div>
+
+    <div class="a3" style="display:flex;gap:12px;margin-bottom:14px;">
+      <div class="card" style="flex:1;padding:12px;text-align:center;">
+        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:var(--saffron);">85.5%</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px;line-height:1.3;">Variation Explained (Adj. R&sup2;)</div>
       </div>
-      <div class="takeaway-item">
-        <div class="ti-val">9.2%</div>
-        <div class="ti-lbl">GDP — Peak Deficit, FY 2020–21</div>
+      <div class="card" style="flex:1;padding:12px;text-align:center;">
+        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:var(--india-green);">4.75%</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px;line-height:1.3;">Deficit/GDP FY 2024&ndash;25</div>
+      </div>
+      <div class="card" style="flex:1;padding:12px;text-align:center;">
+        <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:var(--red);">9.2%</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px;line-height:1.3;">Peak Deficit/GDP FY 2020&ndash;21</div>
+      </div>
+    </div>
+    <p class="a4" style="font-size:11px;color:var(--muted2);font-style:italic;">Data: FY 2005&ndash;06 to 2024&ndash;25 &middot; Sources: RBI Handbook &amp; Ministry of Finance</p>
+  </div>
+
+  <div style="width:1px;background:var(--border);margin:24px 0;align-self:stretch;"></div>
+
+  <!-- Right -->
+  <div style="width:48%;padding:14px 44px 14px 28px;display:flex;flex-direction:column;justify-content:center;gap:11px;">
+    <div class="a5" style="font-size:11px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);margin-bottom:2px;">Policy Implications</div>
+    <div class="a6" style="display:flex;align-items:flex-start;gap:12px;padding:12px 13px;background:var(--white);border:1px solid var(--border);border-radius:12px;box-shadow:0 2px 8px rgba(13,27,42,.05);">
+      <div style="min-width:36px;height:36px;border-radius:10px;background:rgba(232,100,10,.1);display:flex;align-items:center;justify-content:center;font-size:18px;">&#127919;</div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:3px;">Priority 1 &mdash; Subsidy Rationalisation</div>
+        <div style="font-size:11.5px;color:var(--muted);line-height:1.5;">The post-2014 shift to Direct Benefit Transfers (DBT) represents steps in the right direction. Continuation is India's most credible path to structural fiscal balance.</div>
+      </div>
+    </div>
+    <div class="a7" style="display:flex;align-items:flex-start;gap:12px;padding:12px 13px;background:var(--white);border:1px solid var(--border);border-radius:12px;box-shadow:0 2px 8px rgba(13,27,42,.05);">
+      <div style="min-width:36px;height:36px;border-radius:10px;background:rgba(19,136,8,.1);display:flex;align-items:center;justify-content:center;font-size:18px;">&#128200;</div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:3px;">Priority 2 &mdash; Protect Capital Expenditure</div>
+        <div style="font-size:11.5px;color:var(--muted);line-height:1.5;">Empirically confirmed as dynamically self-financing (&beta; = &minus;0.436). The post-COVID infrastructure push is consistent with sustainable fiscal management.</div>
+      </div>
+    </div>
+    <div class="a8" style="display:flex;align-items:flex-start;gap:12px;padding:12px 13px;background:var(--white);border:1px solid var(--border);border-radius:12px;box-shadow:0 2px 8px rgba(13,27,42,.05);">
+      <div style="min-width:36px;height:36px;border-radius:10px;background:rgba(37,99,235,.1);display:flex;align-items:center;justify-content:center;font-size:18px;">&#127963;</div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:3px;">Priority 3 &mdash; FRBM &amp; Revenue Broadening</div>
+        <div style="font-size:11.5px;color:var(--muted);line-height:1.5;">Second most powerful stabiliser (&beta; = &minus;1.647). Broadening India's tax base and improving compliance is essential for long-run structural balance.</div>
       </div>
     </div>
   </div>
-
-  <div class="s8-right">
-    <div style="font-size:11px; font-weight:600; letter-spacing:1.8px; text-transform:uppercase; color:var(--gold); margin-bottom:10px;">Policy Implications</div>
-
-    <div class="policy-card">
-      <div class="pc-title">🎯 Priority 1 — Subsidy Rationalisation</div>
-      <div class="pc-body">Controlling subsidy growth at its source is the most direct lever. The post-2014 shift to Direct Benefit Transfers (DBT) represents steps in this direction; continuation remains India's most credible path to structural fiscal balance.</div>
-    </div>
-    <div class="policy-card">
-      <div class="pc-title">📈 Priority 2 — Protect Capital Expenditure</div>
-      <div class="pc-body">Capital investment should not be sacrificed for consolidation — empirical evidence confirms it is dynamically self-financing. The post-COVID infrastructure push is consistent with sustainable fiscal management.</div>
-    </div>
-    <div class="policy-card">
-      <div class="pc-title">🏛️ Priority 3 — FRBM &amp; Revenue Broadening</div>
-      <div class="pc-body">Structural fiscal sustainability requires broadening India's tax base and improving compliance. Revenue-side strengthening is the second most powerful deficit stabiliser (β = −1.647) in the empirical model.</div>
-    </div>
-
-    <div style="margin-top:12px; background:rgba(200,146,42,0.08); border:1px solid rgba(200,146,42,0.3); border-radius:10px; padding:12px 16px; font-size:12px; color:var(--muted);">
-      <strong style="color:var(--light);">Data period:</strong> FY 2005–06 to FY 2024–25 &nbsp;·&nbsp;
-      <strong style="color:var(--light);">Model:</strong> OLS Log-Ratio Regression &nbsp;·&nbsp;
-      <strong style="color:var(--light);">Source:</strong> RBI &amp; MoF
-    </div>
-  </div>
-  <div class="slide-number-tag">08 / 08</div>
 </div>
+<div class="wm">Quantitative Analysis &middot; Salini Gang</div>
+</div><!-- /s8 -->
 
 </div><!-- /#deck -->
 
-
-<!-- ─── Navigation Bar ────────────────────────────────── -->
+<!-- ======================== NAVIGATION ======================== -->
 <div id="nav">
   <button id="btn-prev" onclick="changeSlide(-1)" disabled>&#8592;</button>
-  <div class="dot-row" id="dot-row"></div>
+  <div class="dr" id="dot-row"></div>
   <span id="slide-counter">1 / 8</span>
   <button id="btn-next" onclick="changeSlide(1)">&#8594;</button>
 </div>
 
-
 <script>
-  const slides = document.querySelectorAll('.slide');
-  const dotRow = document.getElementById('dot-row');
-  const counter = document.getElementById('slide-counter');
-  let current = 0;
+const slides  = document.querySelectorAll('.slide');
+const dotRow  = document.getElementById('dot-row');
+const counter = document.getElementById('slide-counter');
+let current   = 0;
+let animating = false;
 
-  // Build dots
-  slides.forEach((_, i) => {
-    const d = document.createElement('div');
-    d.className = 'dot' + (i === 0 ? ' active' : '');
-    d.onclick = () => goTo(i);
-    dotRow.appendChild(d);
+slides.forEach((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' active' : '');
+  d.onclick = () => goTo(i);
+  dotRow.appendChild(d);
+});
+
+function triggerBars() {
+  document.querySelectorAll('.slide.active .cbar').forEach(bar => {
+    const w = bar.style.width;
+    bar.style.width = '0';
+    requestAnimationFrame(() => {
+      bar.style.transition = 'width 0.85s cubic-bezier(0.34,1.4,0.64,1)';
+      bar.style.width = w;
+      setTimeout(() => { bar.style.transition = ''; }, 900);
+    });
   });
+}
 
-  function goTo(n) {
-    slides[current].classList.remove('active');
+function goTo(n) {
+  if (animating || n === current || n < 0 || n >= slides.length) return;
+  animating = true;
+  const out = slides[current];
+  const dir = n > current ? -1 : 1;
+  out.style.transition = 'opacity .28s ease, transform .28s ease';
+  out.style.opacity = '0';
+  out.style.transform = `translateX(${dir * -50}px)`;
+  setTimeout(() => {
+    out.classList.remove('active');
+    out.style.transition = out.style.opacity = out.style.transform = '';
     dotRow.children[current].classList.remove('active');
     current = n;
-    slides[current].classList.add('active');
     dotRow.children[current].classList.add('active');
-    counter.textContent = `${current + 1} / ${slides.length}`;
+    counter.textContent = (current + 1) + ' / ' + slides.length;
     document.getElementById('btn-prev').disabled = current === 0;
     document.getElementById('btn-next').disabled = current === slides.length - 1;
-  }
+    const inp = slides[current];
+    inp.style.opacity = '0';
+    inp.style.transform = `translateX(${dir * 50}px)`;
+    inp.classList.add('active');
+    requestAnimationFrame(() => {
+      inp.style.transition = 'opacity .32s ease, transform .32s ease';
+      inp.style.opacity = '1';
+      inp.style.transform = 'translateX(0)';
+    });
+    setTimeout(() => {
+      inp.style.transition = inp.style.opacity = inp.style.transform = '';
+      animating = false;
+      triggerBars();
+    }, 340);
+  }, 300);
+}
 
-  function changeSlide(dir) { goTo(current + dir); }
+function changeSlide(d) { goTo(current + d); }
 
-  // Keyboard navigation
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-      if (current < slides.length - 1) changeSlide(1);
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-      if (current > 0) changeSlide(-1);
-    }
-  });
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeSlide(1);
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') changeSlide(-1);
+});
 
-  // Responsive scaling
-  function scaleSlides() {
-    const deck = document.getElementById('deck');
-    const scaleX = window.innerWidth  / 1280;
-    const scaleY = window.innerHeight / 720;
-    const scale = Math.min(scaleX, scaleY) * 0.97;
-    deck.style.transform = `translate(-50%, -50%) scale(${scale})`;
-  }
-  window.addEventListener('resize', scaleSlides);
-  scaleSlides();
+setTimeout(triggerBars, 600);
+
+function scaleSlides() {
+  const s = Math.min(window.innerWidth / 1280, window.innerHeight / 720) * 0.97;
+  document.getElementById('deck').style.transform = `translate(-50%,-50%) scale(${s})`;
+}
+window.addEventListener('resize', scaleSlides);
+scaleSlides();
 </script>
-
 </body>
 </html>
